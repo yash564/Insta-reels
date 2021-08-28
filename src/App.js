@@ -1,24 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useContext, useEffect } from "react";
+import Feeds from "./Components/Feeds";
+import Header from "./Components/Header";
+import Login from "./Components/Login";
+import Profile from "./Components/Profile";
+import Signup from "./Components/Signup";
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from "react-router-dom";
+import { AuthContext, AuthProvider } from "./context/AuthProvider";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <AuthProvider>
+          <Switch>
+            <PrivateRoute path="/" comp={Feeds} exact></PrivateRoute>
+            <Route path="/login" component={Login}></Route>
+            <Route path="/signup" component={Signup}></Route>
+            <Route path="/profile/:id" component={Profile}></Route>
+          </Switch>
+      </AuthProvider>
+    </Router>
+  );
+}
+
+function PrivateRoute({ comp: Component, ...rest }) {
+  let { currentUser } = useContext(AuthContext);
+
+  return (
+    <Route
+      {...rest}
+      render={props => {
+        // console.log(props);
+        return currentUser ? <Component {...props} /> : <Redirect to="/login" />
+      }}
+    ></Route>
   );
 }
 
